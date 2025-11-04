@@ -7,7 +7,6 @@ from repositories.orm_repositories import AircraftModelRepository, FlightReposit
 from services.orm_service import ORMService
 from config import DB_URL
 
-
 engine = create_engine(DB_URL, echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -15,7 +14,6 @@ Base.metadata.create_all(engine)
 
 aircraft_repo = AircraftModelRepository(session)
 flight_repo = FlightRepository(session)
-
 orm_service = ORMService(session)
 
 print("=== ORM DEMO: CRUD и сервисы ===")
@@ -65,46 +63,48 @@ print("\n=== Удаление рейса ===")
 flight_repo.delete(flight)
 print(f"Рейс ID {flight.flight_id} удален")
 
-print("\n=== Демонстрация сервисов ORM ===")
-
 # Query 1
 airport_name = input("Введите название аэропорта для запроса 1: ")
 res1 = orm_service.query1_flights_from_airport(airport_name)
 print("\nQuery 1: Рейсы из аэропорта", airport_name)
 for r in res1:
-    print(r)
+    print(f"Departure Airport: {r['departure_airport']}, Arrival Airport: {r['arrival_airport']}, "
+          f"Model: {r['model_title']}, Departure Date: {r['departure_date']}, Arrival Date: {r['arrival_date']}")
 
 # Query 2
 year = int(input("Введите год для запроса 2: "))
 res2 = orm_service.query2_flight_counts(year)
 print("\nQuery 2: Количество рейсов по аэропортам в", year)
 for r in res2:
-    print(r)
+    print(f"Airport: {r['airport_name']}, Flights Count: {r['count']}")
 
 # Query 3
 res3 = orm_service.query3_top_booked_flights()
 print("\nQuery 3: Топ 5 рейсов по количеству бронирований")
 for r in res3:
-    print(r)
+    print(f"Departure Airport: {r['departure_airport']}, Arrival Airport: {r['arrival_airport']}, "
+          f"Flight Date: {r['departure_date']}, Bookings Count: {r['count']}")
 
 # Query 4
 min_bookings = int(input("Введите минимальное количество бронирований для запроса 4: "))
 res4 = orm_service.query4_customers_with_many_bookings(min_bookings)
 print("\nQuery 4: Клиенты с бронированиями больше", min_bookings)
 for r in res4:
-    print(r)
+    print(f"Customer: {r['first_name']} {r['last_name']}, Bookings Count: {r['count']}")
 
 # Query 5
 res5 = orm_service.query5_flights_with_max_bookings()
 print("\nQuery 5: Рейсы с максимальным количеством бронирований")
 for r in res5:
-    print(r)
+    print(f"Flight ID: {r['flight_id']}")
 
 # Query 6
 res6 = orm_service.query6_booking_statistics()
 print("\nQuery 6: Статистика бронирований по аэропортам")
 for r in res6:
-    print(r)
+    print(f"Departure Airport: {r['departure_airport']}, Min Bookings: {r['min']}, "
+          f"Avg Bookings: {r['avg']}, Max Bookings: {r['max']}")
 
+# Закрытие сессии
 session.close()
 print("\n=== DEMO завершен ===")
